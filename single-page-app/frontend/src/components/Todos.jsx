@@ -36,11 +36,49 @@ export default function Todos() {
   }, []);
   return (
     <TodosContext.Provider value={{ todos, fetchTodos }}>
+      <AddTodo />
       <Stack spacing={5}>
         {todos.map((todo) => (
           <b>{todo.item}</b>
         ))}
       </Stack>
     </TodosContext.Provider>
+  );
+}
+
+// to ad a new todo item on front
+function AddTodo() {
+  const [item, setItem] = React.useState("");
+  const { todos, fetchTodos } = React.useContext(TodosContext);
+
+  const handleInput = (event) => {
+    setItem(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    const newTodo = {
+      id: todos.length + 1,
+      item: item,
+    };
+
+    fetch("http://localhost:8000/todo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newTodo),
+    }).then(fetchTodos);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <InputGroup size="md">
+        <Input
+          pr="4.5rem"
+          type="text"
+          placeholder="Add a todo item"
+          aria-label="Add a todo item"
+          onChange={handleInput}
+        />
+      </InputGroup>
+    </form>
   );
 }
